@@ -113,6 +113,31 @@ The app includes:
 - **Efficient pagination** for better performance
 - **Real-time search and filtering**
 
+## Assumptions and Trade-offs
+
+### Assumptions Made
+- Users prefer visual recipe browsing over text-heavy interfaces
+
+### Trade-offs Made
+- **Client-side vs Server-side filtering**: Chose client-side for simplicity and faster user experience with small dataset, but this wouldn't scale well with thousands of recipes
+- **JSON Server vs Full Database**: Used JSON Server for rapid prototyping, but implemented TypeORM backend architecture for future scalability
+
+
+## Time Tracking
+
+**Total Development Time: ~1 hour 40 minutes**
+
+
+### Completed Features:
+✅ Recipe browsing with card layout  
+✅ Search functionality (title and ingredients)  
+✅ Cuisine filtering  
+✅ Pagination  
+✅ Responsive design
+✅ Backend API with validation  
+✅ TypeORM database integration  
+✅ Repository pattern implementation  
+
 ## Troubleshooting
 
 If you encounter issues:
