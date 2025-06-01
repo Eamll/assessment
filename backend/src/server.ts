@@ -6,6 +6,7 @@ import { Request, Response } from "express";
 import { RepositoryFactory } from "./repositories/RepositoryFactory";
 import { getEnvironmentConfig } from "./config/environment";
 import { IRecipeRepository } from "./repositories/IRecipeRepository";
+import { validateRecipe, validateRecipeUpdate, handleValidationErrors } from "./middleware/validation";
 
 dotenv.config();
 
@@ -60,7 +61,7 @@ app.get("/recipes/:id", async (req: Request, res: Response): Promise<void> => {
   }
 });
 
-app.post("/recipes", async (req: Request, res: Response): Promise<void> => {
+app.post("/recipes", validateRecipe, handleValidationErrors, async (req: Request, res: Response): Promise<void> => {
   try {
     const recipe = await recipeRepository.create(req.body);
     res.status(201).json(recipe);
@@ -70,7 +71,7 @@ app.post("/recipes", async (req: Request, res: Response): Promise<void> => {
   }
 });
 
-app.put("/recipes/:id", async (req: Request, res: Response): Promise<void> => {
+app.put("/recipes/:id", validateRecipeUpdate, handleValidationErrors, async (req: Request, res: Response): Promise<void> => {
   try {
     const id = parseInt(req.params.id);
     const recipe = await recipeRepository.update(id, req.body);
