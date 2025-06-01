@@ -2,19 +2,8 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-
-interface Recipe {
-  id: number;
-  title: string;
-  cuisine: string;
-  difficulty: string;
-  cookTime: number;
-  servings: number;
-  image: string;
-  rating: number;
-  ingredients: string[];
-  description: string;
-}
+import { Recipe } from "../interfaces";
+import { RecipeService } from "../services/recipeService";
 
 export default function Home() {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
@@ -30,8 +19,7 @@ export default function Home() {
 
   const fetchRecipes = async () => {
     try {
-      const response = await fetch("http://localhost:3001/recipes");
-      const data = await response.json();
+      const data = await RecipeService.getRecipes();
       setRecipes(data);
     } catch (error) {
       console.error("Error fetching recipes:", error);

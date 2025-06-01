@@ -4,8 +4,10 @@
   "description": "Backend API for recipe collection app",
   "main": "index.js",
   "scripts": {
-    "dev": "json-server --watch db.json --port 3001",
-    "start": "json-server db.json --port 3001",
+    "dev": "nodemon src/server.ts",
+    "start": "node dist/server.js",
+    "build": "tsc",
+    "seed": "ts-node src/seed.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
@@ -18,7 +20,10 @@
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
-    "express": "^5.1.0"
+    "express": "^5.1.0",
+    "reflect-metadata": "^0.2.2",
+    "sqlite3": "^5.1.7",
+    "typeorm": "^0.3.24"
   },
   "devDependencies": {
     "@types/cors": "^2.8.18",
