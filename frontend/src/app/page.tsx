@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Recipe } from "../interfaces";
 import { RecipeService } from "../services/recipeService";
+import AddRecipeForm from "../components/AddRecipeForm";
 
 export default function Home() {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
@@ -11,6 +12,7 @@ export default function Home() {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCuisine, setSelectedCuisine] = useState("");
+  const [showAddForm, setShowAddForm] = useState(false);
   const recipesPerPage = 6;
 
   useEffect(() => {
@@ -19,13 +21,22 @@ export default function Home() {
 
   const fetchRecipes = async () => {
     try {
-      const data = await RecipeService.getRecipes();
+      const data = await RecipeService.getRecipes({ _limit: 100 }); // Get all recipes
       setRecipes(data);
     } catch (error) {
       console.error("Error fetching recipes:", error);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleAddRecipeSuccess = () => {
+    setShowAddForm(false);
+    fetchRecipes(); // Refresh the recipe list
+  };
+
+  const handleAddRecipeCancel = () => {
+    setShowAddForm(false);
   };
 
   const filteredRecipes = recipes.filter((recipe) => {
@@ -74,12 +85,23 @@ export default function Home() {
       {/* Header */}
       <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <h1 className="text-3xl font-bold text-gray-900">
-            Recipe Collection
-          </h1>
-          <p className="text-gray-600 mt-2">
-            Discover and share amazing recipes from around the world
-          </p>
+          <div className="flex justify-between items-start">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">
+                Recipe Collection
+              </h1>
+              <p className="text-gray-600 mt-2">
+                Discover and share amazing recipes from around the world
+              </p>
+            </div>
+            <button
+              onClick={() => setShowAddForm(true)}
+              className="bg-orange-500 text-white px-6 py-3 rounded-lg hover:bg-orange-600 transition-colors duration-200 flex items-center gap-2"
+            >
+              <span className="text-xl">+</span>
+              Add Recipe
+            </button>
+          </div>
         </div>
       </header>
 
@@ -95,7 +117,7 @@ export default function Home() {
                 setSearchTerm(e.target.value);
                 setCurrentPage(1);
               }}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-black"
             />
           </div>
           <select
@@ -104,7 +126,7 @@ export default function Home() {
               setSelectedCuisine(e.target.value);
               setCurrentPage(1);
             }}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-black"
           >
             <option value="">All Cuisines</option>
             {cuisines.map((cuisine) => (
@@ -120,7 +142,7 @@ export default function Home() {
           {paginatedRecipes.map((recipe) => (
             <div
               key={recipe.id}
-              className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300"
+              className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg hover:border-2 hover:border-orange-500 transition-all duration-300 border-2 border-transparent"
             >
               <div className="relative h-48">
                 <Image
@@ -167,7 +189,7 @@ export default function Home() {
                       {recipe.rating}
                     </span>
                   </div>
-                  <button className="bg-orange-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-orange-600 transition-colors duration-200">
+                  <button className="bg-orange-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-orange-600 transition-colors duration-200 font-medium">
                     View Recipe
                   </button>
                 </div>
@@ -182,7 +204,7 @@ export default function Home() {
             <button
               onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
               disabled={currentPage === 1}
-              className="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+              className="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 text-black"
             >
               Previous
             </button>
@@ -193,7 +215,7 @@ export default function Home() {
                 className={`px-4 py-2 border rounded-lg ${
                   currentPage === page
                     ? "bg-orange-500 text-white border-orange-500"
-                    : "border-gray-300 hover:bg-gray-50"
+                    : "border-gray-300 hover:bg-gray-50 text-black"
                 }`}
               >
                 {page}
@@ -204,13 +226,21 @@ export default function Home() {
                 setCurrentPage((prev) => Math.min(prev + 1, totalPages))
               }
               disabled={currentPage === totalPages}
-              className="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+              className="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 text-black"
             >
               Next
             </button>
           </div>
         )}
       </div>
+
+      {/* Add Recipe Form Modal */}
+      {showAddForm && (
+        <AddRecipeForm
+          onSuccess={handleAddRecipeSuccess}
+          onCancel={handleAddRecipeCancel}
+        />
+      )}
     </div>
   );
 }
