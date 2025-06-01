@@ -142,7 +142,7 @@ export default function Home() {
           {paginatedRecipes.map((recipe) => (
             <div
               key={recipe.id}
-              className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300"
+              className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg hover:border-2 hover:border-orange-500 transition-all duration-300 border-2 border-transparent"
             >
               <div className="relative h-48">
                 <Image
