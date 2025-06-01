@@ -133,7 +133,7 @@ The app includes:
 ✅ Search functionality (title and ingredients)  
 ✅ Cuisine filtering  
 ✅ Pagination  
-✅ Responsive design
+✅ Responsive design  
 ✅ Backend API with validation  
 ✅ TypeORM database integration  
 ✅ Repository pattern implementation  
