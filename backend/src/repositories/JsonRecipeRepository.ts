@@ -1,7 +1,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 import { IRecipeRepository } from './IRecipeRepository';
-import { RecipeData, RecipeFilters, PaginationOptions } from '../types/Recipe';
+import { RecipeData, RecipeFilters, PaginationOptions } from '../interfaces';
 
 export class JsonRecipeRepository implements IRecipeRepository {
   private dbPath: string;

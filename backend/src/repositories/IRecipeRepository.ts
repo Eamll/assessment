@@ -1,4 +1,4 @@
-import { RecipeData, RecipeFilters, PaginationOptions } from "../types/Recipe";
+import { RecipeData, RecipeFilters, PaginationOptions } from "../interfaces";
 
 export interface IRecipeRepository {
   findAll(filters?: RecipeFilters, pagination?: PaginationOptions): Promise<RecipeData[]>;

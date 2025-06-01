@@ -2,7 +2,7 @@ import { Repository, Like, FindManyOptions } from 'typeorm';
 import { AppDataSource } from '../data-source';
 import { Recipe } from '../entities/Recipe';
 import { IRecipeRepository } from './IRecipeRepository';
-import { RecipeData, RecipeFilters, PaginationOptions } from '../types/Recipe';
+import { RecipeData, RecipeFilters, PaginationOptions } from '../interfaces';
 
 export class TypeOrmRecipeRepository implements IRecipeRepository {
   private repository: Repository<Recipe>;
