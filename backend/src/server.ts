@@ -3,47 +3,39 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import { Request, Response } from "express";
-import { AppDataSource, initializeDatabase } from "./data-source";
-import { Recipe } from "./entities/Recipe";
-import { Like, FindManyOptions } from "typeorm";
+import { RepositoryFactory } from "./repositories/RepositoryFactory";
+import { getEnvironmentConfig } from "./config/environment";
+import { IRecipeRepository } from "./repositories/IRecipeRepository";
 
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const config = getEnvironmentConfig();
 
 app.use(cors());
 app.use(express.json());
 
+let recipeRepository: IRecipeRepository;
+
 app.get("/recipes", async (req: Request, res: Response): Promise<void> => {
   try {
     const { cuisine, difficulty, _page, _limit } = req.query;
-    const recipeRepository = AppDataSource.getRepository(Recipe);
-    
-    const page = parseInt(_page as string) || 1;
-    const limit = parseInt(_limit as string) || 10;
-    const skip = (page - 1) * limit;
 
-    const findOptions: FindManyOptions<Recipe> = {
-      skip,
-      take: limit,
+    const filters = {
+      ...(cuisine && { cuisine: cuisine as string }),
+      ...(difficulty && { difficulty: difficulty as string }),
     };
 
-    const where: any = {};
-    
-    if (cuisine) {
-      where.cuisine = Like(`%${cuisine}%`);
-    }
-    
-    if (difficulty) {
-      where.difficulty = Like(`%${difficulty}%`);
-    }
+    const pagination = {
+      page: parseInt(_page as string) || 1,
+      limit: parseInt(_limit as string) || 10,
+    };
 
-    if (Object.keys(where).length > 0) {
-      findOptions.where = where;
-    }
+    const recipes = await recipeRepository.findAll(
+      Object.keys(filters).length > 0 ? filters : undefined,
+      pagination
+    );
 
-    const recipes = await recipeRepository.find(findOptions);
     res.json(recipes);
   } catch (error) {
     console.error("Error fetching recipes:", error);
@@ -54,8 +46,7 @@ app.get("/recipes", async (req: Request, res: Response): Promise<void> => {
 app.get("/recipes/:id", async (req: Request, res: Response): Promise<void> => {
   try {
     const id = parseInt(req.params.id);
-    const recipeRepository = AppDataSource.getRepository(Recipe);
-    const recipe = await recipeRepository.findOne({ where: { id } });
+    const recipe = await recipeRepository.findById(id);
 
     if (!recipe) {
       res.status(404).json({ error: "Recipe not found" });
@@ -69,12 +60,61 @@ app.get("/recipes/:id", async (req: Request, res: Response): Promise<void> => {
   }
 });
 
+app.post("/recipes", async (req: Request, res: Response): Promise<void> => {
+  try {
+    const recipe = await recipeRepository.create(req.body);
+    res.status(201).json(recipe);
+  } catch (error) {
+    console.error("Error creating recipe:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+app.put("/recipes/:id", async (req: Request, res: Response): Promise<void> => {
+  try {
+    const id = parseInt(req.params.id);
+    const recipe = await recipeRepository.update(id, req.body);
+
+    if (!recipe) {
+      res.status(404).json({ error: "Recipe not found" });
+      return;
+    }
+
+    res.json(recipe);
+  } catch (error) {
+    console.error("Error updating recipe:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+app.delete(
+  "/recipes/:id",
+  async (req: Request, res: Response): Promise<void> => {
+    try {
+      const id = parseInt(req.params.id);
+      const deleted = await recipeRepository.delete(id);
+
+      if (!deleted) {
+        res.status(404).json({ error: "Recipe not found" });
+        return;
+      }
+
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error deleting recipe:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  }
+);
+
 const startServer = async () => {
   try {
-    await initializeDatabase();
-    
-    app.listen(PORT, () => {
-      console.log(`Server running on http://localhost:${PORT}`);
+    recipeRepository = await RepositoryFactory.createRecipeRepository();
+
+    console.log(`Using ${config.dataSource} data source`);
+
+    app.listen(config.port, () => {
+      console.log(`Server running on http://localhost:${config.port}`);
     });
   } catch (error) {
     console.error("Failed to start server:", error);
