@@ -4,8 +4,9 @@
   "description": "Backend API for recipe collection app",
   "main": "index.js",
   "scripts": {
-    "dev": "json-server --watch db.json --port 3001",
-    "start": "json-server db.json --port 3001",
+    "dev": "nodemon src/server.ts",
+    "start": "node dist/server.js",
+    "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
