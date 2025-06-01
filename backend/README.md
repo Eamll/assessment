@@ -28,6 +28,27 @@ DB_TYPE=sqlite
 DB_DATABASE=database.sqlite
 ```
 
+## Setup
+
+### Environment Configuration
+
+1. **Create environment file**
+   ```bash
+   cp .env.example .env
+   ```
+
+2. **Configure your environment** (edit `.env` file):
+   ```bash
+   # For JSON storage (default - no database required)
+   DATA_SOURCE=json
+   JSON_DB_PATH=./db.json
+   
+   # For SQLite database
+   DATA_SOURCE=typeorm
+   DB_TYPE=sqlite
+   DB_DATABASE=database.sqlite
+   ```
+
 ## Usage
 
 ### Development
@@ -35,9 +56,11 @@ DB_DATABASE=database.sqlite
 # Install dependencies
 npm install
 
+# Create environment file from example
+cp .env.example .env
+
 # Use JSON storage (default)
 npm run dev
-
 
 # Seed database (TypeORM only)
 npm run seed
