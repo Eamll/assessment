@@ -22,11 +22,25 @@ const initialFormData: RecipeFormData = {
 };
 
 const cuisineOptions = [
-  "Italian", "Indian", "American", "Mexican", "Thai", "Japanese", 
-  "French", "Chinese", "Mediterranean", "Korean", "British", "Moroccan", "Greek"
+  "Italian",
+  "Indian",
+  "American",
+  "Mexican",
+  "Thai",
+  "Japanese",
+  "French",
+  "Chinese",
+  "Mediterranean",
+  "Korean",
+  "British",
+  "Moroccan",
+  "Greek",
 ];
 
-export default function AddRecipeForm({ onSuccess, onCancel }: AddRecipeFormProps) {
+export default function AddRecipeForm({
+  onSuccess,
+  onCancel,
+}: AddRecipeFormProps) {
   const [formData, setFormData] = useState<RecipeFormData>(initialFormData);
   const [errors, setErrors] = useState<RecipeFormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -67,7 +81,7 @@ export default function AddRecipeForm({ onSuccess, onCancel }: AddRecipeFormProp
       newErrors.rating = "Rating must be between 1 and 5";
     }
 
-    const validIngredients = formData.ingredients.filter(ing => ing.trim());
+    const validIngredients = formData.ingredients.filter((ing) => ing.trim());
     if (validIngredients.length === 0) {
       newErrors.ingredients = "At least one ingredient is required";
     }
@@ -92,60 +106,63 @@ export default function AddRecipeForm({ onSuccess, onCancel }: AddRecipeFormProp
   };
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
   ) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: name === 'cookTime' || name === 'servings' || name === 'rating' 
-        ? Number(value) 
-        : value
+      [name]:
+        name === "cookTime" || name === "servings" || name === "rating"
+          ? Number(value)
+          : value,
     }));
-    
+
     if (errors[name as keyof RecipeFormErrors]) {
-      setErrors(prev => ({ ...prev, [name]: undefined }));
+      setErrors((prev) => ({ ...prev, [name]: undefined }));
     }
   };
 
   const handleIngredientChange = (index: number, value: string) => {
     const newIngredients = [...formData.ingredients];
     newIngredients[index] = value;
-    setFormData(prev => ({ ...prev, ingredients: newIngredients }));
-    
+    setFormData((prev) => ({ ...prev, ingredients: newIngredients }));
+
     if (errors.ingredients) {
-      setErrors(prev => ({ ...prev, ingredients: undefined }));
+      setErrors((prev) => ({ ...prev, ingredients: undefined }));
     }
   };
 
   const addIngredient = () => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      ingredients: [...prev.ingredients, ""]
+      ingredients: [...prev.ingredients, ""],
     }));
   };
 
   const removeIngredient = (index: number) => {
     if (formData.ingredients.length > 1) {
       const newIngredients = formData.ingredients.filter((_, i) => i !== index);
-      setFormData(prev => ({ ...prev, ingredients: newIngredients }));
+      setFormData((prev) => ({ ...prev, ingredients: newIngredients }));
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
 
     setIsSubmitting(true);
     try {
-      const validIngredients = formData.ingredients.filter(ing => ing.trim());
+      const validIngredients = formData.ingredients.filter((ing) => ing.trim());
       const recipeData = {
         ...formData,
-        ingredients: validIngredients
+        ingredients: validIngredients,
       };
-      
+
       await RecipeService.createRecipe(recipeData);
       setShowSuccess(true);
       setTimeout(() => {
@@ -162,39 +179,46 @@ export default function AddRecipeForm({ onSuccess, onCancel }: AddRecipeFormProp
 
   if (showSuccess) {
     return (
-      <div 
-        className="fixed inset-0 bg-black bg-opacity-20 flex items-center justify-center z-50"
+      <div
+        className="fixed inset-0 flex items-center justify-center z-50 backdrop-blur-sm bg-black/20"
         onClick={onCancel}
       >
-        <div 
+        <div
           className="bg-white rounded-lg p-8 max-w-md w-full mx-4 text-center"
           onClick={(e) => e.stopPropagation()}
         >
           <div className="text-6xl mb-4">✅</div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Recipe Created!</h2>
-          <p className="text-gray-600">Your recipe has been successfully added to the collection.</p>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            Recipe Created!
+          </h2>
+          <p className="text-gray-600">
+            Your recipe has been successfully added to the collection.
+          </p>
         </div>
       </div>
     );
   }
 
   return (
-    <div 
-      className="fixed inset-0 bg-black bg-opacity-20 flex items-center justify-center z-50 overflow-y-auto"
+    <div
+      className="fixed inset-0 flex items-center justify-center z-50 overflow-y-auto backdrop-blur-sm bg-black/20"
       onClick={onCancel}
     >
-      <div 
+      <div
         className="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 my-8"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="p-6 border-b border-gray-200">
           <h2 className="text-2xl font-bold text-gray-900">Add New Recipe</h2>
         </div>
-        
+
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
           {/* Title */}
           <div>
-            <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="title"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               Recipe Title *
             </label>
             <input
@@ -204,17 +228,22 @@ export default function AddRecipeForm({ onSuccess, onCancel }: AddRecipeFormProp
               value={formData.title}
               onChange={handleInputChange}
               className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-black ${
-                errors.title ? 'border-red-500' : 'border-gray-300'
+                errors.title ? "border-red-500" : "border-gray-300"
               }`}
               placeholder="Enter recipe title"
             />
-            {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title}</p>}
+            {errors.title && (
+              <p className="text-red-500 text-sm mt-1">{errors.title}</p>
+            )}
           </div>
 
           {/* Cuisine and Difficulty */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label htmlFor="cuisine" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="cuisine"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Cuisine *
               </label>
               <select
@@ -223,19 +252,26 @@ export default function AddRecipeForm({ onSuccess, onCancel }: AddRecipeFormProp
                 value={formData.cuisine}
                 onChange={handleInputChange}
                 className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-black ${
-                  errors.cuisine ? 'border-red-500' : 'border-gray-300'
+                  errors.cuisine ? "border-red-500" : "border-gray-300"
                 }`}
               >
                 <option value="">Select cuisine</option>
-                {cuisineOptions.map(cuisine => (
-                  <option key={cuisine} value={cuisine}>{cuisine}</option>
+                {cuisineOptions.map((cuisine) => (
+                  <option key={cuisine} value={cuisine}>
+                    {cuisine}
+                  </option>
                 ))}
               </select>
-              {errors.cuisine && <p className="text-red-500 text-sm mt-1">{errors.cuisine}</p>}
+              {errors.cuisine && (
+                <p className="text-red-500 text-sm mt-1">{errors.cuisine}</p>
+              )}
             </div>
 
             <div>
-              <label htmlFor="difficulty" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="difficulty"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Difficulty *
               </label>
               <select
@@ -255,7 +291,10 @@ export default function AddRecipeForm({ onSuccess, onCancel }: AddRecipeFormProp
           {/* Cook Time and Servings */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label htmlFor="cookTime" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="cookTime"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Cook Time (minutes) *
               </label>
               <input
@@ -267,15 +306,20 @@ export default function AddRecipeForm({ onSuccess, onCancel }: AddRecipeFormProp
                 min="1"
                 max="600"
                 className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-black ${
-                  errors.cookTime ? 'border-red-500' : 'border-gray-300'
+                  errors.cookTime ? "border-red-500" : "border-gray-300"
                 }`}
                 placeholder="30"
               />
-              {errors.cookTime && <p className="text-red-500 text-sm mt-1">{errors.cookTime}</p>}
+              {errors.cookTime && (
+                <p className="text-red-500 text-sm mt-1">{errors.cookTime}</p>
+              )}
             </div>
 
             <div>
-              <label htmlFor="servings" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="servings"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Servings *
               </label>
               <input
@@ -287,18 +331,23 @@ export default function AddRecipeForm({ onSuccess, onCancel }: AddRecipeFormProp
                 min="1"
                 max="50"
                 className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-black ${
-                  errors.servings ? 'border-red-500' : 'border-gray-300'
+                  errors.servings ? "border-red-500" : "border-gray-300"
                 }`}
                 placeholder="4"
               />
-              {errors.servings && <p className="text-red-500 text-sm mt-1">{errors.servings}</p>}
+              {errors.servings && (
+                <p className="text-red-500 text-sm mt-1">{errors.servings}</p>
+              )}
             </div>
           </div>
 
           {/* Image URL and Rating */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label htmlFor="image" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="image"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Image URL *
               </label>
               <input
@@ -308,15 +357,20 @@ export default function AddRecipeForm({ onSuccess, onCancel }: AddRecipeFormProp
                 value={formData.image}
                 onChange={handleInputChange}
                 className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-black ${
-                  errors.image ? 'border-red-500' : 'border-gray-300'
+                  errors.image ? "border-red-500" : "border-gray-300"
                 }`}
                 placeholder="https://example.com/image.jpg"
               />
-              {errors.image && <p className="text-red-500 text-sm mt-1">{errors.image}</p>}
+              {errors.image && (
+                <p className="text-red-500 text-sm mt-1">{errors.image}</p>
+              )}
             </div>
 
             <div>
-              <label htmlFor="rating" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="rating"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Rating (1-5) *
               </label>
               <input
@@ -329,11 +383,13 @@ export default function AddRecipeForm({ onSuccess, onCancel }: AddRecipeFormProp
                 max="5"
                 step="0.1"
                 className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-black ${
-                  errors.rating ? 'border-red-500' : 'border-gray-300'
+                  errors.rating ? "border-red-500" : "border-gray-300"
                 }`}
                 placeholder="5"
               />
-              {errors.rating && <p className="text-red-500 text-sm mt-1">{errors.rating}</p>}
+              {errors.rating && (
+                <p className="text-red-500 text-sm mt-1">{errors.rating}</p>
+              )}
             </div>
           </div>
 
@@ -348,9 +404,11 @@ export default function AddRecipeForm({ onSuccess, onCancel }: AddRecipeFormProp
                   <input
                     type="text"
                     value={ingredient}
-                    onChange={(e) => handleIngredientChange(index, e.target.value)}
+                    onChange={(e) =>
+                      handleIngredientChange(index, e.target.value)
+                    }
                     className={`flex-1 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-black ${
-                      errors.ingredients ? 'border-red-500' : 'border-gray-300'
+                      errors.ingredients ? "border-red-500" : "border-gray-300"
                     }`}
                     placeholder={`Ingredient ${index + 1}`}
                   />
@@ -373,12 +431,17 @@ export default function AddRecipeForm({ onSuccess, onCancel }: AddRecipeFormProp
             >
               + Add Ingredient
             </button>
-            {errors.ingredients && <p className="text-red-500 text-sm mt-1">{errors.ingredients}</p>}
+            {errors.ingredients && (
+              <p className="text-red-500 text-sm mt-1">{errors.ingredients}</p>
+            )}
           </div>
 
           {/* Description */}
           <div>
-            <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="description"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               Description *
             </label>
             <textarea
@@ -388,11 +451,13 @@ export default function AddRecipeForm({ onSuccess, onCancel }: AddRecipeFormProp
               onChange={handleInputChange}
               rows={4}
               className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-black ${
-                errors.description ? 'border-red-500' : 'border-gray-300'
+                errors.description ? "border-red-500" : "border-gray-300"
               }`}
               placeholder="Describe your recipe..."
             />
-            {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description}</p>}
+            {errors.description && (
+              <p className="text-red-500 text-sm mt-1">{errors.description}</p>
+            )}
           </div>
 
           {/* Form Actions */}
